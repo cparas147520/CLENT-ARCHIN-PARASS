@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { PhoneSimulator } from './components/PhoneSimulator';
+import { ExpoSection } from './components/ExpoSection';
 import { ProjectsSection } from './components/ProjectsSection';
 import { InteractiveCodePlayground } from './components/InteractiveCodePlayground';
 import { SkillsSection } from './components/SkillsSection';
@@ -32,6 +33,7 @@ export default function App() {
       <main className="flex-1 relative z-10">
         <Hero onOpenResume={() => setIsResumeOpen(true)} />
         <PhoneSimulator />
+        <ExpoSection />
         <ProjectsSection />
         <InteractiveCodePlayground />
         <SkillsSection />

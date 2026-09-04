@@ -27,6 +27,7 @@ export const Footer: React.FC = () => {
           <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] uppercase font-bold tracking-[0.2em] text-white/70">
             <a href="#hero" className="hover:text-[#FF3B3F] transition-colors">Home</a>
             <a href="#simulator" className="hover:text-[#FF3B3F] transition-colors">App Simulator</a>
+            <a href="#expo" className="hover:text-[#FF3B3F] transition-colors text-[#FF3B3F]">Expo Hub</a>
             <a href="#projects" className="hover:text-[#FF3B3F] transition-colors">Projects</a>
             <a href="#sandbox" className="hover:text-[#FF3B3F] transition-colors">RN Sandbox</a>
             <a href="#skills" className="hover:text-[#FF3B3F] transition-colors">Skills</a>

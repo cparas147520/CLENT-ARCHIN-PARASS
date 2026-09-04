@@ -33,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDevMenu, onOpenResume }) =
   const navLinks = [
     { label: 'Overview', href: '#hero' },
     { label: 'Live Simulator', href: '#simulator' },
+    { label: 'Expo Hub', href: '#expo' },
     { label: 'Projects', href: '#projects' },
     { label: 'RN Sandbox', href: '#sandbox' },
     { label: 'Skills', href: '#skills' },

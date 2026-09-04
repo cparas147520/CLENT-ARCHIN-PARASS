@@ -27,11 +27,13 @@ import {
   Terminal,
   Layers,
   Zap,
-  Info
+  Info,
+  QrCode,
+  Compass
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-type AppType = 'pulsefit' | 'omnishop' | 'devchat' | 'uikit';
+type AppType = 'pulsefit' | 'omnishop' | 'devchat' | 'uikit' | 'expo';
 
 interface Message {
   id: string;
@@ -77,6 +79,10 @@ export const PhoneSimulator: React.FC = () => {
   const [hapticFeedbackTriggered, setHapticFeedbackTriggered] = useState(false);
   const [activeSegment, setActiveSegment] = useState<'Daily' | 'Weekly' | 'Monthly'>('Weekly');
   const [cardSwiped, setCardSwiped] = useState(false);
+
+  // Expo Go App State
+  const [expoScanningQr, setExpoScanningQr] = useState(false);
+  const [expoActiveTab, setExpoActiveTab] = useState<'projects' | 'diagnostics'>('projects');
 
   // Clock updater
   useEffect(() => {
@@ -306,6 +312,49 @@ export const SpringGestureCard = () => {
     </GestureDetector>
   );
 };`
+    },
+    expo: {
+      title: 'Expo SDK 52 Router & Over-The-Air Engine',
+      filename: 'app/(tabs)/index.tsx',
+      code: `import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import * as Updates from 'expo-updates';
+
+export default function ExpoHomeScreen() {
+  const router = useRouter();
+
+  const handleLaunchApp = async (route: string) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push(route);
+  };
+
+  const handleFetchOTAUpdate = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      }
+    } catch (e) {
+      console.log('EAS Update check:', e);
+    }
+  };
+
+  return (
+    <View className="flex-1 bg-black p-4">
+      <Text className="text-white text-2xl font-black">Expo Go Client</Text>
+      <Text className="text-red-500 font-mono text-xs">SDK 52.0.0 • Hermes AOT</Text>
+      <TouchableOpacity 
+        onPress={() => handleLaunchApp('/pulsefit')}
+        className="mt-4 bg-red-500 p-3.5 items-center"
+      >
+        <Text className="text-black font-bold uppercase">Launch PulseFit</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}`
     }
   };
 
@@ -429,6 +478,18 @@ export const SpringGestureCard = () => {
             >
               <Sparkles className="w-3.5 h-3.5" />
               RN UI Lab
+            </button>
+            <button
+              id="app-tab-expo"
+              onClick={() => { setActiveApp('expo'); triggerHaptic(); }}
+              className={`flex items-center gap-2 px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all whitespace-nowrap ${
+                activeApp === 'expo'
+                  ? 'bg-[#FF3B3F] text-black shadow-md'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              Expo Go
             </button>
           </div>
 
@@ -958,6 +1019,153 @@ export const SpringGestureCard = () => {
                           <span className="text-[9px] text-white/40">ImpactFeedback</span>
                         </button>
                       </div>
+                    </motion.div>
+                  )}
+
+                  {/* APP 5: EXPO GO CLIENT */}
+                  {activeApp === 'expo' && (
+                    <motion.div
+                      key="expo"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex-1 p-4 pb-20 flex flex-col space-y-3"
+                    >
+                      {/* Expo Go Header */}
+                      <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-black border border-[#FF3B3F] flex items-center justify-center font-mono font-black text-xs text-[#FF3B3F]">
+                            E
+                          </div>
+                          <div>
+                            <p className="text-xs font-black uppercase text-white tracking-wider">Expo Go</p>
+                            <p className="text-[9px] font-mono text-[#FF3B3F]">SDK 52.0.0 • Client</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 bg-[#141414] p-0.5 border border-white/10 text-[9px] font-mono">
+                          <button
+                            onClick={() => setExpoActiveTab('projects')}
+                            className={`px-2 py-0.5 uppercase tracking-wider font-bold ${
+                              expoActiveTab === 'projects' ? 'bg-[#FF3B3F] text-black' : 'text-white/50'
+                            }`}
+                          >
+                            Projects
+                          </button>
+                          <button
+                            onClick={() => setExpoActiveTab('diagnostics')}
+                            className={`px-2 py-0.5 uppercase tracking-wider font-bold ${
+                              expoActiveTab === 'diagnostics' ? 'bg-[#FF3B3F] text-black' : 'text-white/50'
+                            }`}
+                          >
+                            Diag
+                          </button>
+                        </div>
+                      </div>
+
+                      {expoActiveTab === 'projects' ? (
+                        <>
+                          {/* Fast Connect / Scan Simulator */}
+                          <div className="bg-[#141414] p-3 border border-white/10">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[10px] font-mono uppercase tracking-wider text-white font-bold">Fast Connect</span>
+                              <span className="text-[9px] font-mono text-[#FF3B3F]">Metro Bundler</span>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                setExpoScanningQr(!expoScanningQr);
+                                triggerHaptic();
+                              }}
+                              className={`w-full py-2 px-3 text-[10px] font-mono uppercase tracking-wider font-bold flex items-center justify-center gap-2 border transition-all ${
+                                expoScanningQr
+                                  ? 'bg-[#FF3B3F] text-black border-[#FF3B3F]'
+                                  : 'bg-black text-white hover:bg-white/10 border-white/10'
+                              }`}
+                            >
+                              <QrCode className="w-3.5 h-3.5" />
+                              <span>{expoScanningQr ? 'Close Scanner' : 'Scan Expo QR Code'}</span>
+                            </button>
+
+                            {expoScanningQr && (
+                              <div className="mt-2.5 p-3 bg-black border border-[#FF3B3F]/50 flex flex-col items-center">
+                                <div className="w-20 h-20 border-2 border-dashed border-[#FF3B3F] relative flex items-center justify-center">
+                                  <div className="w-16 h-0.5 bg-[#FF3B3F] animate-pulse" />
+                                </div>
+                                <p className="text-[8px] font-mono text-white/50 uppercase mt-2">Camera Bridge Live</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Development Servers List */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] uppercase font-mono text-white/40 px-0.5">
+                              <span>Development Servers</span>
+                              <span>Local Wi-Fi</span>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              {[
+                                { name: 'PulseFit Track', port: '8081', target: 'pulsefit', tag: 'Reanimated 3' },
+                                { name: 'OmniShop Go', port: '8082', target: 'omnishop', tag: 'Stripe Pay' },
+                                { name: 'DevChat Realtime', port: '8083', target: 'devchat', tag: 'Supabase' },
+                                { name: 'NativeUI Motion Kit', port: '8084', target: 'uikit', tag: 'Gestures' },
+                              ].map((srv) => (
+                                <button
+                                  key={srv.port}
+                                  onClick={() => {
+                                    setActiveApp(srv.target as AppType);
+                                    triggerHaptic();
+                                  }}
+                                  className="w-full p-2.5 bg-[#141414] hover:bg-black border border-white/10 hover:border-[#FF3B3F] text-left transition-all flex items-center justify-between group"
+                                >
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                      <p className="text-xs font-bold text-white uppercase group-hover:text-[#FF3B3F] transition-colors">{srv.name}</p>
+                                    </div>
+                                    <p className="text-[9px] font-mono text-white/40 mt-0.5">exp://192.168.1.15:{srv.port}</p>
+                                  </div>
+                                  <span className="text-[9px] font-mono uppercase text-[#FF3B3F] bg-[#FF3B3F]/10 px-2 py-0.5 border border-[#FF3B3F]/20">
+                                    Launch →
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Logged in User Bar */}
+                          <div className="mt-auto p-2 bg-black border border-white/10 flex items-center justify-between text-[10px] font-mono text-white/60">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                              @clentparas
+                            </span>
+                            <span className="text-white/40">UMindanao Org</span>
+                          </div>
+                        </>
+                      ) : (
+                        /* Diagnostics Tab */
+                        <div className="space-y-2 font-mono text-xs">
+                          <div className="bg-[#141414] p-3 border border-white/10 space-y-1">
+                            <p className="text-[9px] uppercase text-[#FF3B3F] font-bold">Runtime Specifications</p>
+                            <p className="text-[11px] text-white">Hermes: <span className="text-emerald-400">0.12 Bytecode Active</span></p>
+                            <p className="text-[11px] text-white">Fabric UI Manager: <span className="text-emerald-400">Enabled</span></p>
+                            <p className="text-[11px] text-white">TurboModules (JSI): <span className="text-emerald-400">34 Registered</span></p>
+                          </div>
+
+                          <div className="bg-[#141414] p-3 border border-white/10 space-y-1">
+                            <p className="text-[9px] uppercase text-[#FF3B3F] font-bold">EAS Update Telemetry</p>
+                            <p className="text-[11px] text-white">Release Channel: <span className="text-white/70">production</span></p>
+                            <p className="text-[11px] text-white">Runtime Version: <span className="text-white/70">52.0.0</span></p>
+                            <p className="text-[11px] text-white">Rollback Status: <span className="text-emerald-400">Healthy (0 rollbacks)</span></p>
+                          </div>
+
+                          <div className="bg-black p-3 border border-white/10 text-center">
+                            <p className="text-[9px] uppercase text-white/40">Engine Memory Footprint</p>
+                            <p className="text-sm font-bold text-white mt-1">38.4 MB / 512 MB</p>
+                          </div>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
